@@ -29,11 +29,6 @@ end
 
 function run(env=envpath(), depot=depotpath(); input::IO=stdin, output::IO=stdout)
     activate()
-    if !hasmanifest()
-        @info("Initializing LSPNeovim environment")
-        Pkg.update()
-    end
-    Pkg.instantiate()  # this really should never be needed, but it's here just in case
     @info("Initializing Language Server", pwd(), env, depot)
     s = LanguageServer.LanguageServerInstance(input, output, env, depot)
     s.runlinter = true
