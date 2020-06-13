@@ -8,5 +8,5 @@ Pkg.activate(PKGDIR)
 Pkg.instantiate()
 #==================================================================#
 
-using LSPNeovim
+using LSPNeovim, SymbolServer
 LSPNeovim.run()
