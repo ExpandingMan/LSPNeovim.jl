@@ -1,0 +1,25 @@
+language: julia
+
+julia:
+  - 1.0
+  - 1.4
+  - nightly
+
+os:
+  - linux
+  - osx
+  - windows
+
+arch:
+  - amd64
+  - i386
+
+notifications:
+  email: false
+
+jobs:
+  exclude:
+    - os: osx
+      arch: i386
+  allow_failures:
+    - julia: nightly
