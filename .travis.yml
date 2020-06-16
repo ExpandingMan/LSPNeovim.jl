@@ -18,8 +18,5 @@ notifications:
   email: false
 
 jobs:
-  exclude:
-    - os: osx
-      arch: i386
   allow_failures:
     - julia: nightly
