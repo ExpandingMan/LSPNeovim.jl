@@ -51,10 +51,15 @@ end
 Run the `LanguageServerInstance`.  This will also activate the `LSPNeovim` environment.
 By default, this will attempt to determine an appropriate environment, see `envpath`.
 """
-@main function run(env=envpath(), depot=depotpath(); input::IO=stdin, output::IO=stdout)
+function run(env=envpath(), depot=depotpath(); input::IO=stdin, output::IO=stdout, download=false)
     @info("Initializing Language Server", pwd(), env, depot)
-    s = LanguageServer.LanguageServerInstance(input, output, env, depot)
+    s = LanguageServer.LanguageServerInstance(input, output, env, depot, nothing, nothing, download)
     s.runlinter = true
     LanguageServer.run(s)
 end
+
+"""doc"""
+@main function main(;download=false)
+    return run(;download)
 end # module
+end
