@@ -4,12 +4,7 @@ using LanguageServer, SymbolServer
 using Comonicon
 
 # shamelessly borrowed from https://github.com/ExpandingMan/LSPNeovim.jl, which is no longer maintained
-
-const PKGDIR = joinpath(@__DIR__,"..")
-
-
 depotpath() = get(ENV, "JULIA_DEPOT_PATH", Pkg.depots1())
-
 _defaultenvpath() = dirname(Base.load_path_expand("@v#.#"))
 
 """
@@ -20,20 +15,17 @@ Checks whether there is a valid `Manifest.toml` in directory `dir`.  If no argum
 will check for the `Manifest.toml` in the `LSPNeovim` environment.
 """
 hasmanifest(dir::AbstractString) = isfile(joinpath(dir,"Manifest.toml"))
-hasmanifest() = hasmanifest(PKGDIR)
 
 _juliaproject() = get(ENV, "JULIA_PROJECT", nothing)
 _juliaprojectbase() = Base.current_project()
 
 function resolve_julia_project()
-    project = _juliaproject()
-    project_base = _juliaprojectbase()
-    if !isnothing(project)
-        return project
-    end
-    if !isnothing(project_base)
-        return project_base
-    end
+    return something(
+        _juliaproject(),
+        _juliaprojectbase(),
+        get(Base.load_path(), 1, nothing),
+        _defaultenvpath()
+    )
 end
 
 
@@ -51,16 +43,8 @@ in the following order
 The first of these to contain a `Manifest.toml` will be the environment used for LanguageServer.
 """
 function envpath(dirs=[pwd(), joinpath(pwd(),".."), _defaultenvpath()])
-    project = resolve_julia_project()
-    if !isnothing(project)
-        return project
-    end
     dirs = filter(hasmanifest, dirs)
-    if isempty(dirs)
-        @warn("Failed to find a usable environment with valid Manifest.toml.  Checked:", dirs)
-        return ""
-    end
-    return first(dirs)
+    isempty(dirs) ? resolve_julia_project() : first(dirs)
 end
 
 """
