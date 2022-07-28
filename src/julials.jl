@@ -72,7 +72,9 @@ function run(
     LanguageServer.run(s)
 end
 
-"""doc"""
+"""
+`julials`: Start the julia language server
+"""
 @main function main(; download = false)
     return run(; download)
 end # module
