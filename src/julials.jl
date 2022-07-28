@@ -7,10 +7,6 @@ using Comonicon
 
 const PKGDIR = joinpath(@__DIR__,"..")
 
-function activate()
-    @info("Activating LSP environment")
-    Pkg.activate(PKGDIR)
-end
 
 depotpath() = get(ENV, "JULIA_DEPOT_PATH", Pkg.depots1())
 
@@ -72,7 +68,6 @@ Run the `LanguageServerInstance`.  This will also activate the `LSPNeovim` envir
 By default, this will attempt to determine an appropriate environment, see `envpath`.
 """
 @main function run(env=envpath(), depot=depotpath(); input::IO=stdin, output::IO=stdout)
-    activate()
     @info("Initializing Language Server", pwd(), env, depot)
     s = LanguageServer.LanguageServerInstance(input, output, env, depot)
     s.runlinter = true
