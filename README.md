@@ -3,7 +3,7 @@
 Clone this repo, cd into it, and 
 
 ```sh
-julia --project=. -e 'using Pkg; Pkg.build()'
+./INSTALL
 ```
 
 Should install the package to `$HOME/.julia/bin/`. Make sure this is in your PATH and then you are good to go! The command `julials` should start the server
@@ -19,7 +19,7 @@ local servers = {
             julia = {
                 symbolCacheDownload = false,
                 runtimeCompletions = true,
-                singleFileSupport = true,
+                singleFileSupport = false,
                 useRevise = true,
                 lint = {
                     NumThreads = 11,
@@ -32,18 +32,7 @@ local servers = {
         },
 
     },
-    sumneko_lua = {
-        cmd = {
-            "lua-language-server",
-        },
-        settings = {
-            Lua = {
-                diagnostics = {
-                    globals = { "vim" },
-                },
-            },
-        },
-    },
+    -- other servers go here
 }
 
 for lsp, setup in pairs(servers) do
