@@ -1,13 +1,14 @@
-module LSPNeovim
-
+module julials
 using Pkg
 using LanguageServer, SymbolServer
+using Comonicon
+
+# shamelessly borrowed from https://github.com/ExpandingMan/LSPNeovim.jl, which is no longer maintained
 
 const PKGDIR = joinpath(@__DIR__,"..")
 
-
 function activate()
-    @info("Activating LSPNeovim environment")
+    @info("Activating LSP environment")
     Pkg.activate(PKGDIR)
 end
 
@@ -25,6 +26,22 @@ will check for the `Manifest.toml` in the `LSPNeovim` environment.
 hasmanifest(dir::AbstractString) = isfile(joinpath(dir,"Manifest.toml"))
 hasmanifest() = hasmanifest(PKGDIR)
 
+_juliaproject() = get(ENV, "JULIA_PROJECT", nothing)
+_juliaprojectbase() = Base.current_project()
+
+function resolve_julia_project()
+    project = _juliaproject()
+    project_base = _juliaprojectbase()
+    if !isnothing(project)
+        return project
+    end
+    if !isnothing(project_base)
+        return project_base
+    end
+end
+
+
+
 """
     envpath()
 
@@ -38,26 +55,27 @@ in the following order
 The first of these to contain a `Manifest.toml` will be the environment used for LanguageServer.
 """
 function envpath(dirs=[pwd(), joinpath(pwd(),".."), _defaultenvpath()])
+    project = resolve_julia_project()
+    if !isnothing(project)
+        return project
+    end
     dirs = filter(hasmanifest, dirs)
     if isempty(dirs)
         @warn("Failed to find a usable environment with valid Manifest.toml.  Checked:", dirs)
         return ""
     end
-    first(dirs)
+    return first(dirs)
 end
 
 """
-    run(env=envpath(), depot=depotpath(); input=stdin, output=stdout)
-
 Run the `LanguageServerInstance`.  This will also activate the `LSPNeovim` environment.
 By default, this will attempt to determine an appropriate environment, see `envpath`.
 """
-function run(env=envpath(), depot=depotpath(); input::IO=stdin, output::IO=stdout)
+@main function run(env=envpath(), depot=depotpath(); input::IO=stdin, output::IO=stdout)
     activate()
     @info("Initializing Language Server", pwd(), env, depot)
     s = LanguageServer.LanguageServerInstance(input, output, env, depot)
     s.runlinter = true
     LanguageServer.run(s)
 end
-
 end # module
